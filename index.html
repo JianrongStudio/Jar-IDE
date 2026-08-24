@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金荣工作室 · JarPython-IDE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #e6f0f5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            padding: 1.5rem;
+        }
+
+        .card {
+            max-width: 1000px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 20, 30, 0.25),
+                        0 2px 8px rgba(0,0,0,0.03);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.002);
+        }
+
+        .split-layout {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        /* 左侧图片区 — 占一半宽度，背景柔和 */
+        .image-side {
+            flex: 1 1 48%;
+            min-width: 280px;
+            background: #f2f7fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.8rem 1.8rem 1.8rem 1.8rem;
+            backdrop-filter: blur(2px);
+        }
+
+        .image-side img {
+            width: 100%;
+            height: auto;
+            max-height: 380px;
+            object-fit: cover;
+            border-radius: 1.8rem;
+            box-shadow: 0 12px 24px -8px rgba(0, 20, 30, 0.15);
+            transition: all 0.25s;
+            display: block;
+            background: #d9e2e8; /* fallback while loading */
+        }
+
+        .image-side img:hover {
+            box-shadow: 0 20px 32px -12px rgba(0, 40, 60, 0.25);
+            transform: scale(1.01);
+        }
+
+        /* 右侧文字 + 按钮区 */
+        .content-side {
+            flex: 1 1 48%;
+            min-width: 280px;
+            padding: 2.2rem 2.5rem 2.5rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #ffffff;
+        }
+
+        .content-side .text-group {
+            margin-bottom: 2rem;
+        }
+
+        .content-side h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #0b1e2b;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+        }
+
+        .content-side .subhead {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #2d4b5e;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .content-side p {
+            font-size: 1.08rem;
+            line-height: 1.6;
+            color: #1e3b4c;
+            margin: 0.5rem 0 1.2rem 0;
+            max-width: 90%;
+        }
+
+        .content-side .description {
+            border-left: 4px solid #5d9bb0;
+            padding-left: 1.2rem;
+            background: #f3f9fe;
+            border-radius: 0 12px 12px 0;
+            padding: 0.9rem 1.2rem;
+            margin: 1.2rem 0 1.8rem 0;
+            font-size: 1rem;
+            color: #1c3d4f;
+        }
+
+        /* 跳转按钮 */
+        .btn-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem 1.5rem;
+            margin-top: 0.2rem;
+        }
+
+        .btn-jump {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #1f4b5e;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 0.9rem 2.2rem;
+            border-radius: 60px;
+            text-decoration: none;
+            box-shadow: 0 6px 14px rgba(26, 67, 83, 0.25);
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+            border: 1px solid rgba(255,255,255,0.08);
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+            min-width: 140px;
+        }
+
+        .btn-jump:hover {
+            background: #123a4b;
+            box-shadow: 0 10px 20px -4px rgba(16, 56, 72, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-jump:active {
+            transform: scale(0.97);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .btn-jump i {
+            margin-right: 8px;
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #1f4b5e;
+            box-shadow: none;
+            border: 1.5px solid #1f4b5e;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .btn-secondary:hover {
+            background: #1f4b5e;
+            color: white;
+            box-shadow: 0 6px 14px rgba(26, 67, 83, 0.2);
+        }
+
+        .hint-text {
+            font-size: 0.9rem;
+            color: #3b5f70;
+            opacity: 0.7;
+            margin-top: 0.1rem;
+        }
+
+        /* 小屏适配 */
+        @media (max-width: 700px) {
+            .split-layout {
+                flex-direction: column;
+            }
+
+            .image-side {
+                padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+            }
+
+            .image-side img {
+                max-height: 280px;
+                border-radius: 1.5rem;
+            }
+
+            .content-side {
+                padding: 1.8rem 1.8rem 2rem 1.8rem;
+            }
+
+            .content-side h2 {
+                font-size: 1.8rem;
+            }
+
+            .content-side p {
+                max-width: 100%;
+            }
+
+            .btn-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-jump {
+                justify-content: center;
+                white-space: normal;
+                padding: 0.8rem 1.2rem;
+                min-width: unset;
+            }
+
+            .btn-secondary {
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .content-side h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* 模拟图标 (纯CSS小装饰) */
+        .icon-arrow {
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .btn-jump:hover .icon-arrow {
+            transform: translateX(4px);
+        }
+
+        .badge {
+            background: #d3e4ed;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #124052;
+            letter-spacing: 0.02em;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="split-layout">
+            <!-- 左侧：图片 -->
+            <div class="image-side">
+                <img 
+                    src="https://jianrongstudio.github.io/jar-ide" 
+                    alt="现代UI · 简洁精美" 
+                    loading="lazy"
+                >
+            </div>
+
+            <!-- 右侧：文字 + 按钮 -->
+            <div class="content-side">
+                <div class="text-group">
+                    <span class="subhead">✦ 探索 · 发现</span>
+                    <h2>Jar Python IDE</h2>
+
+                    <div class="description">
+                        <span style="font-weight:500;">JpIDE</span><br>
+                        划时代的，美观的，清亮的IDE
+                    </div>
+                </div>
+
+                <!-- 按钮组：跳转链接 -->
+                <div class="btn-wrapper">
+                    <a href="https://pan.huang1111.cn/s/vVxEwFE" target="_blank" class="btn-jump" rel="noopener noreferrer">
+                        <span class="icon-arrow">↗</span> 前往下载
+                    </a>
+                    <a href="https://space.bilibili.com/1947622964?spm_id_from=333.788.0.0" target="_blank" class="btn-jump btn-secondary" rel="noopener noreferrer">
+                        <span style="margin-right:6px;">作者B站</span> Jianrong金荣工作室
+                    </a>
+                </div>
+                <div class="hint-text">
+                    <span class="badge">JianrongStudio</span> 体验不同产品
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
