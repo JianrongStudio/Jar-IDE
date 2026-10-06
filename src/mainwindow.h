@@ -10,6 +10,7 @@ class QFileSystemModel;
 class QTabWidget;
 class CodeEditor;
 class QPlainTextEdit;
+class QLineEdit;
 class PythonRunner;
 class QLabel;
 class QPushButton;
@@ -30,17 +31,22 @@ private slots:
     void saveCurrent();
     void runCurrent();
     void closeTab(int idx);
+    void updateTabModified(bool m);
+    void runCommand(const QString &cmd);
+    void openSettings();
 
 private:
     void buildUi();
     QWidget *buildTitleBar();
     CodeEditor *currentEditor() const;
     void toggleMax();
+    int  editorIndex(CodeEditor *ed) const;
 
     QTreeView        *m_tree = nullptr;
     QFileSystemModel *m_fs   = nullptr;
     QTabWidget       *m_tabs = nullptr;
     QPlainTextEdit   *m_out  = nullptr;
+    QLineEdit        *m_termInput = nullptr;
     PythonRunner     *m_runner = nullptr;
     QLabel           *m_pyLabel = nullptr;
     QLabel           *m_titleLabel = nullptr;
