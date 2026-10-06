@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/res">
+        <file>style.qss</file>
+        <file>icons/logo.svg</file>
+        <file>icons/folder.svg</file>
+        <file>icons/file.svg</file>
+        <file>icons/new-project.svg</file>
+        <file>icons/open-folder.svg</file>
+        <file>icons/open-file.svg</file>
+        <file>icons/run.svg</file>
+        <file>icons/python.svg</file>
+        <file>icons/close.svg</file>
+        <file>icons/terminal.svg</file>
+    </qresource>
+</RCC>

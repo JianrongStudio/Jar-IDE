@@ -1,0 +1,9 @@
+build/
+build_log.txt
+bin/
+*.o
+*.obj
+Makefile*
+.qmake.stash
+*.user
+*.exe
