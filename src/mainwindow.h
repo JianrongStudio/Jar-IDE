@@ -57,6 +57,7 @@ private:
     QString  m_explorerRoot;
     JroProject m_jro;
     QString  m_pythonExe;
+    QString  m_termCwd;
     QPoint   m_dragPos;
     bool     m_maximized = false;
 };

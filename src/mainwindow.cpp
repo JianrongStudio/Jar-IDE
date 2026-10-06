@@ -29,6 +29,27 @@
 #include <QKeySequence>
 #include <QProcess>
 #include <QSettings>
+#include <QPainter>
+
+// Hand-drawn vector glyphs for the frameless window buttons (no emoji / no text art).
+static QIcon winGlyph(const QString &kind, const QColor &ink = QColor("#cdd9e5"))
+{
+    QPixmap pm(24, 24);
+    pm.fill(Qt::transparent);
+    QPainter p(&pm);
+    p.setRenderHint(QPainter::Antialiasing, true);
+    p.setPen(QPen(ink, 1.5, Qt::SolidLine, Qt::RoundCap));
+    if (kind == "min") {
+        p.drawLine(7, 17, 17, 17);
+    } else if (kind == "max") {
+        p.drawRect(7, 7, 10, 10);
+    } else if (kind == "close") {
+        p.drawLine(7, 7, 17, 17);
+        p.drawLine(17, 7, 7, 17);
+    }
+    p.end();
+    return QIcon(pm);
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -58,27 +79,32 @@ QWidget *MainWindow::buildTitleBar()
     auto *btnMin = new QPushButton(bar);
     btnMin->setObjectName("winBtnMin");
     btnMin->setFixedSize(42, 28);
-    btnMin->setText("_");
+    btnMin->setIcon(winGlyph("min"));
+    btnMin->setIconSize(QSize(16,16));
     connect(btnMin, &QPushButton::clicked, this, &QWidget::showMinimized);
     m_btnMax = new QPushButton(bar);
     m_btnMax->setObjectName("winBtnMax");
     m_btnMax->setFixedSize(42, 28);
-    m_btnMax->setText("□");
+    m_btnMax->setIcon(winGlyph("max"));
+    m_btnMax->setIconSize(QSize(16,16));
     connect(m_btnMax, &QPushButton::clicked, this, &MainWindow::toggleMax);
     auto *btnClose = new QPushButton(bar);
     btnClose->setObjectName("winBtnClose");
     btnClose->setFixedSize(46, 28);
-    btnClose->setText("X");
+    btnClose->setIcon(winGlyph("close", QColor("#e6edf3")));
+    btnClose->setIconSize(QSize(16,16));
     connect(btnClose, &QPushButton::clicked, qApp, &QApplication::quit);
-    h->addWidget(btnMin); h->addWidget(m_btnMax); h->addWidget(btnClose);
+    h->addWidget(btnMin);
+    h->addWidget(m_btnMax);
+    h->addWidget(btnClose);
     bar->installEventFilter(this);
     return bar;
 }
 
 void MainWindow::toggleMax()
 {
-    if (m_maximized) { showNormal(); m_btnMax->setText("□"); }
-    else { showMaximized(); m_btnMax->setText("❐"); }
+    if (m_maximized) showNormal();
+    else showMaximized();
     m_maximized = !m_maximized;
 }
 
@@ -142,7 +168,9 @@ void MainWindow::buildUi()
     auto *btnRun  = new QPushButton(QIcon(AppStyle::iconPath("run.svg")), tr("Run"));
     auto *btnSet  = new QPushButton(QIcon(AppStyle::iconPath("python.svg")), tr("Settings"));
     btnRun->setStyleSheet("QPushButton{background:#1f9d55; color:#fff;} QPushButton:hover{background:#26b665;}");
-    btnNew->setObjectName("ghost"); btnSave->setObjectName("ghost"); btnSet->setObjectName("ghost");
+    btnNew->setObjectName("ghost");
+    btnSave->setObjectName("ghost");
+    btnSet->setObjectName("ghost");
     bh->addWidget(btnNew); bh->addWidget(btnSave); bh->addStretch();
     bh->addWidget(btnSet);  bh->addWidget(btnRun);
     vv->addWidget(bar);
@@ -151,7 +179,8 @@ void MainWindow::buildUi()
     vv->addWidget(m_tabs, 1);
     auto *term = new QWidget;
     auto *tv = new QVBoxLayout(term);
-    tv->setContentsMargins(0, 0, 0, 0); tv->setSpacing(0);
+    tv->setContentsMargins(0, 0, 0, 0);
+    tv->setSpacing(0);
     m_out = new QPlainTextEdit;
     m_out->setObjectName("terminalOut");
     m_out->setReadOnly(true);
@@ -159,7 +188,8 @@ void MainWindow::buildUi()
     tv->addWidget(m_out);
     auto *inRow = new QWidget;
     auto *ih = new QHBoxLayout(inRow);
-    ih->setContentsMargins(8, 4, 8, 6); ih->setSpacing(6);
+    ih->setContentsMargins(8, 4, 8, 6);
+    ih->setSpacing(6);
     auto *prompt = new QLabel(">");
     prompt->setObjectName("termPrompt");
     m_termInput = new QLineEdit;
@@ -226,6 +256,7 @@ void MainWindow::openPath(const QString &path)
     QDir().mkpath(m_explorerRoot);
     m_fs->setRootPath(m_explorerRoot);
     m_tree->setRootIndex(m_fs->index(m_explorerRoot));
+    m_termCwd = m_explorerRoot;
     if (!m_jro.isNull()) {
         QString mainPy = QDir(m_explorerRoot).filePath("main.py");
         if (QFileInfo::exists(mainPy)) openFileInTab(mainPy);
@@ -235,9 +266,7 @@ void MainWindow::openPath(const QString &path)
 }
 
 CodeEditor *MainWindow::currentEditor() const { return qobject_cast<CodeEditor*>(m_tabs->currentWidget()); }
-
-int MainWindow::editorIndex(CodeEditor *ed) const
-{
+int MainWindow::editorIndex(CodeEditor *ed) const {
     for (int i = 0; i < m_tabs->count(); ++i)
         if (m_tabs->widget(i) == ed) return i;
     return -1;
@@ -305,20 +334,24 @@ void MainWindow::saveCurrent()
 void MainWindow::runCommand(const QString &cmd)
 {
     m_out->appendPlainText("> " + cmd);
-    QStringList parts; QString cur; bool inQuote = false;
-    for (int i = 0; i < cmd.size(); ++i) {
-        QChar c = cmd[i];
-        if (c == '"') { inQuote = !inQuote; continue; }
-        if ((c == ' ' || c == '\t') && !inQuote) { if (!cur.isEmpty()) { parts << cur; cur.clear(); } }
-        else cur += c;
+    const QString trimmed = cmd.trimmed();
+    const QString base = m_termCwd.isEmpty() ? QDir::currentPath() : m_termCwd;
+    if (trimmed.toLower().startsWith("cd")) {
+        QString arg = trimmed.mid(2).trimmed();
+        if (arg == "~" || arg.isEmpty()) m_termCwd = QDir::homePath();
+        else {
+            QDir target(QDir(base).absoluteFilePath(arg));
+            if (target.exists() && target.isReadable()) m_termCwd = target.absolutePath();
+            else { m_out->appendPlainText("The system cannot find the path specified."); return; }
+        }
+        m_out->appendPlainText(m_termCwd);
+        return;
     }
-    if (!cur.isEmpty()) parts << cur;
-    if (parts.isEmpty()) return;
-    QString prog = parts.takeFirst();
     auto *proc = new QProcess(this);
+    proc->setProgram("cmd.exe");
+    proc->setArguments({"/d", "/s", "/c", trimmed});
     proc->setProcessChannelMode(QProcess::MergedChannels);
-    QString work = m_explorerRoot.isEmpty() ? m_projectRoot : m_explorerRoot;
-    proc->setWorkingDirectory(work);
+    proc->setWorkingDirectory(base);
     connect(proc, &QProcess::readyReadStandardOutput, this, [this, proc](){
         m_out->appendPlainText(QString::fromLocal8Bit(proc->readAll()));
     });
@@ -327,7 +360,7 @@ void MainWindow::runCommand(const QString &cmd)
         m_out->appendPlainText(QString("[exit code %1]\n").arg(code));
         proc->deleteLater();
     });
-    proc->start(prog, parts);
+    proc->start();
     if (!proc->waitForStarted(3000))
         m_out->appendPlainText("[error] could not start: " + proc->errorString());
 }
