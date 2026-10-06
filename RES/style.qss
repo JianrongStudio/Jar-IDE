@@ -1,4 +1,4 @@
-/* Jar-IDE global stylesheet — dark glass */
+/* Jar-IDE global stylesheet - dark glass */
 * { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; outline: none; }
 QMainWindow, QDialog { background-color: #0d1117; color: #e6edf3; }
 #welcomeRoot { background-color: qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 #0b1020, stop:0.5 #0d1117, stop:1 #0a1a24); }
@@ -26,3 +26,9 @@ QLabel { color:#cdd9e5; }
 QStatusBar { background:#0a0e14; color:#8b98a9; }
 QScrollBar:vertical { background:transparent; width:10px; }
 QScrollBar::handle:vertical { background:#2a3444; border-radius:5px; min-height:30px; }
+#titleBar { background-color:#0a0e14; border-bottom:1px solid #1c2430; }
+QLabel#titleText { color:#cdd9e5; font-size:12px; font-weight:600; padding-left:6px; }
+QPushButton#winBtnMin, QPushButton#winBtnMax { background:transparent; color:#9aa7b5; border:none; border-radius:6px; font-size:13px; }
+QPushButton#winBtnMin:hover, QPushButton#winBtnMax:hover { background: rgba(255,255,255,30); color:#fff; }
+QPushButton#winBtnClose { background:transparent; color:#9aa7b5; border:none; border-radius:6px; font-size:12px; }
+QPushButton#winBtnClose:hover { background:#e81123; color:#fff; }

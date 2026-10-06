@@ -1,86 +1,54 @@
 <div align="center">
 
-# 🪶 Jar-IDE
+# Jar-IDE
 
-**A lightweight, animated Python IDE built with C++ / Qt5.**  
-一款轻量、动画拉满、基于 C++ / Qt5 的 Python 编辑器。
+**A lightweight, animated Python IDE built with C++ / Qt5.**
+
+一款轻量、动画流畅、基于 C++ / Qt5 的 Python 编辑器。
 
 ![C++](https://img.shields.io/badge/C%2B%2B-17-00599C)
 ![Qt](https://img.shields.io/badge/Qt-5.14-41CD52)
-![Platform](https://img.shields.io/badge/Windows-7~11-0078D6)
+![Platform](https://img.shields.io/badge/Windows-7%20~%2011-0078D6)
 
 [English](#english) · [中文](#中文)
 
 </div>
 
----
-
 ## English
 
-Jar-IDE is a small, good-looking Python editor for Windows. It starts fast, animates everything it can, and runs on **Windows 7 through Windows 11** (that is exactly why Qt 5.14 was chosen).
+Jar-IDE is a small, good-looking Python editor for Windows, running on **Windows 7 through Windows 11**.
 
-### ✨ Features
+### Features
+- Auto Python bootstrap: download python-3.12.0-amd64 when no interpreter is found.
+- Guided welcome screen with a custom frameless title bar.
+- Jianrong projects: scaffold `project.jro` + `src/`; explorer shows only `.py` files.
+- Code editor with line numbers, Python syntax highlighting, multi-tab, run.
+- Dark glass QSS theme, hover animations.
 
-- 🌐 **Auto Python bootstrap** — on launch it checks for a Python 3 install. If none is found, it downloads the official `python-3.12.0-amd64.exe` installer and opens it.
-- 🧭 **Guided welcome screen** — three animated cards: *Open Folder*, *Open File*, *New Jianrong Project*.
-- 🗂️ **Jianrong projects** — a first-class project type created inside the IDE: choose a directory + name, scaffold `project.jro` + `src/` with a ready `main.py`.
-- 🖋️ **Code editor** — line-number gutter, Python syntax highlighting, multi-tab editing, save / run.
-- ▶️ **One-click run** — runs the current script via QProcess and streams stdout/stderr to a bottom panel.
-- 🎨 **Dark glass UI** — gradient brand card, hover animations, hand-rolled QSS theme.
-
-### 📁 Project structure
-
+### Build
+Requires Qt 5.14.2 (MinGW 7.3 64-bit):
 ```
-Jar-IDE/
-├── JarIDE.pro
-├── src/                 # C++ sources
-└── RES/                 # icons, style.qss, resources.qrc
-```
-
-### 🧱 Build
-
-Requires **Qt 5.14.2 (MinGW 7.3 64-bit)**.
-
-```bash
 qmake JarIDE.pro
 mingw32-make -j4
-# output: bin/JarIDE.exe
 ```
 
-### 📄 The `.jro` manifest
-
-```xml
-<Jianrong project="MyProject">
-  <python.version="3.12">
-  <file>
-    main.py
-  </file>
-</Jianrong>
-```
-
----
+### Portable build
+A bare exe needs the Qt runtime. Copy the needed DLLs next to the exe (Qt5Core/Gui/Widgets/Network/Svg, MinGW runtime, platforms/qwindows.dll, imageformats/qsvg.dll).
 
 ## 中文
 
-Jar-IDE 是一款面向 Windows 的轻量 Python 编辑器，启动快、动画足，兼容 **Windows 7 到 Windows 11**。
+Jar-IDE 是面向 Windows 的轻量 Python 编辑器，兼容 Windows 7 ~ 11。
 
-### ✨ 特性
+### 特性
+- 启动检测 Python，缺失自动下载 3.12.0 安装包。
+- 无边框自绘标题栏；欢迎页三张卡片。
+- Jianrong 项目：自动生成 project.jro 与 src/，文件浏览器只显示 .py。
+- 行号、语法高亮、多标签、一键运行。
 
-- 🌐 **自动检测 Python**：启动检测系统是否装有 Python 3；缺失时自动下载官方 `python-3.12.0-amd64.exe` 并打开安装。
-- 🧭 **动画欢迎页**：打开文件夹 / 打开文件 / 新建 Jianrong 项目三张卡片。
-- 🗂️ **Jianrong 项目**：IDE 内建项目类型。选目录、输项目名，自动生成 `project.jro` 与 `src/main.py`。
-- 🖋️ **代码编辑**：行号、Python 语法高亮、多标签、保存与运行。
-- ▶️ **一键运行**：QProcess 执行脚本，输出实时显示在底部面板。
-- 🎨 **深色玻璃风界面**：渐变卡片、悬停动效、手写 QSS。
-
-### 🧱 构建
-
-需要 **Qt 5.14.2（MinGW 7.3 64 位）**。
-
-```bash
+### 构建
+```
 qmake JarIDE.pro
 mingw32-make -j4
-# 产物：bin/JarIDE.exe
 ```
 
-<div align="center"><sub>Built with C++17 & Qt 5.14 · MIT License</sub></div>
+<div align="center"><sub>MIT License</sub></div>

@@ -4,7 +4,7 @@
 #  Target: Windows 7 ~ Windows 11 (Qt 5.14 MinGW 7.3 64-bit)
 # ============================================================
 
-QT       += core gui widgets network
+QT       += core gui widgets network svg
 
 CONFIG   += c++17
 CONFIG   -= app_bundle
@@ -12,10 +12,8 @@ CONFIG   -= app_bundle
 TARGET    = JarIDE
 TEMPLATE  = app
 
-# ---- Win7 compatibility: no Win10-only effects required ----
 DEFINES += QT_DEPRECATED_WARNINGS
 
-# ---- Allow large files / modern API on MinGW ----
 unix:!macx: LIBS += -ldl
 
 SOURCES += \
@@ -42,7 +40,6 @@ HEADERS += \
 RESOURCES += \
     RES/resources.qrc
 
-# ---- Output directories ----
 DESTDIR     = bin
 OBJECTS_DIR = build/obj
 MOC_DIR     = build/moc
